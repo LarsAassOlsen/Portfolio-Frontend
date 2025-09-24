@@ -1,0 +1,39 @@
+:root {
+  --background: 255 255 255;
+  --foreground: 10 10 10;
+  --card: 255 255 255;
+  --card-foreground: 17 24 39;
+  --muted: 245 245 248;
+  --muted-foreground: 107 114 128;
+  --primary: 99 102 241; /* indigo-500 */
+  --primary-foreground: 255 255 255;
+}
+
+/* Dark mode */
+.dark {
+  --background: 10 10 10;
+  --foreground: 243 244 246;
+  --card: 17 17 19;
+  --card-foreground: 243 244 246;
+  --muted: 24 24 27;
+  --muted-foreground: 161 161 170;
+  --primary: 99 102 241;
+  --primary-foreground: 255 255 255;
+}
+
+.bg-background { background-color: rgb(var(--background)); }
+.text-foreground { color: rgb(var(--foreground)); }
+.bg-card { background-color: rgb(var(--card)); }
+.text-card-foreground { color: rgb(var(--card-foreground)); }
+.bg-muted { background-color: rgb(var(--muted)); }
+.text-muted-foreground { color: rgb(var(--muted-foreground)); }
+.text-primary { color: rgb(var(--primary)); }
+.bg-primary { background-color: rgb(var(--primary)); }
+.border-primary { border-color: rgb(var(--primary)); }
+.text-primary-foreground { color: rgb(var(--primary-foreground)); }
+
+:focus-visible {
+  outline: 2px solid rgb(var(--primary));
+  outline-offset: 2px;
+  border-radius: 8px;
+}
