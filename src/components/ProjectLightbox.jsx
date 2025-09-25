@@ -6,9 +6,22 @@ import { X, ChevronLeft, ChevronRight, Github, ExternalLink } from "lucide-react
 export default function ProjectLightbox({ project, onClose }) {
   if (!project) return null;
 
-  const imgs = project?.images?.length ? project.images : [project.thumb].filter(Boolean);
-  const images = (imgs || []).map((src) => (src ? encodeURI(src) : src));
+  const rawMedia = React.useMemo(() => {
+    if (Array.isArray(project.media) && project.media.length) return project.media;
+    const imgs = project?.images?.length ? project.images : [project.thumb].filter(Boolean);
+    return (imgs || []).map((src) => ({ type: "image", src }));
+  }, [project]);
+
+  const media = React.useMemo(
+    () =>
+      rawMedia.map((m) =>
+        m.type === "image" ? { ...m, src: m.src ? encodeURI(m.src) : m.src } : m
+      ),
+    [rawMedia]
+  );
+
   const [index, setIndex] = React.useState(0);
+  const current = media[index];
 
   React.useEffect(() => {
     const prev = document.documentElement.style.overflow;
@@ -19,16 +32,16 @@ export default function ProjectLightbox({ project, onClose }) {
   React.useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") onClose?.();
-      if (!images.length) return;
-      if (e.key === "ArrowRight") setIndex((i) => (i + 1) % images.length);
-      if (e.key === "ArrowLeft") setIndex((i) => (i - 1 + images.length) % images.length);
+      if (!media.length) return;
+      if (e.key === "ArrowRight") setIndex((i) => (i + 1) % media.length);
+      if (e.key === "ArrowLeft") setIndex((i) => (i - 1 + media.length) % media.length);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [images, onClose]);
+  }, [media, onClose]);
 
-  const goPrev = () => setIndex((i) => (i - 1 + images.length) % images.length);
-  const goNext = () => setIndex((i) => (i + 1) % images.length);
+  const goPrev = () => setIndex((i) => (i - 1 + media.length) % media.length);
+  const goNext = () => setIndex((i) => (i + 1) % media.length);
 
   return createPortal(
     <AnimatePresence>
@@ -71,34 +84,54 @@ export default function ProjectLightbox({ project, onClose }) {
             </button>
           </div>
 
-          {/* Image area */}
+          {/* Media area */}
           <div className="relative bg-black">
             <div className="aspect-video w-full grid place-items-center">
-              {images.length ? (
+              {current?.type === "image" && current.src && (
                 <img
-                  src={images[index]}
+                  src={current.src}
                   alt={`${project.title} screenshot ${index + 1}`}
                   className="max-h-[70vh] w-full object-contain select-none"
                   draggable={false}
                 />
-              ) : (
-                <div className="text-muted-foreground">No images provided.</div>
+              )}
+
+              {current?.type === "youtube" && current.id && (
+                <iframe
+                  className="h-full w-full"
+                  src={`https://www.youtube-nocookie.com/embed/${current.id}?rel=0&modestbranding=1&autoplay=1`}
+                  title={current.title || project.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              )}
+
+              {current?.type === "video" && current.src && (
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster={current.poster}
+                  className="max-h-[70vh] w-full object-contain bg-black"
+                  src={current.src}
+                />
               )}
             </div>
 
-            {images.length > 1 && (
+            {media.length > 1 && (
               <>
                 <button
                   onClick={goPrev}
                   className="absolute left-2 top-1/2 -translate-y-1/2 rounded-xl border bg-card/90 p-2 hover:shadow"
-                  aria-label="Previous image"
+                  aria-label="Previous"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
                   onClick={goNext}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl border bg-card/90 p-2 hover:shadow"
-                  aria-label="Next image"
+                  aria-label="Next"
                 >
                   <ChevronRight className="h-5 w-5" />
                 </button>
@@ -138,14 +171,14 @@ export default function ProjectLightbox({ project, onClose }) {
           </div>
 
           {/* Dots */}
-          {images.length > 1 && (
+          {media.length > 1 && (
             <div className="flex items-center justify-center gap-2 p-3">
-              {images.map((_, i) => (
+              {media.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setIndex(i)}
                   className={`h-2.5 w-2.5 rounded-full border ${i === index ? "bg-foreground" : "bg-transparent"}`}
-                  aria-label={`Go to image ${i + 1}`}
+                  aria-label={`Go to item ${i + 1}`}
                 />
               ))}
             </div>
