@@ -6,6 +6,7 @@ import { X, ChevronLeft, ChevronRight, Github, ExternalLink } from "lucide-react
 export default function ProjectLightbox({ project, onClose }) {
   if (!project) return null;
 
+  // Media list
   const rawMedia = React.useMemo(() => {
     if (Array.isArray(project.media) && project.media.length) return project.media;
     const imgs = project?.images?.length ? project.images : [project.thumb].filter(Boolean);
@@ -23,12 +24,14 @@ export default function ProjectLightbox({ project, onClose }) {
   const [index, setIndex] = React.useState(0);
   const current = media[index];
 
+  // Scroll lock
   React.useEffect(() => {
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     return () => (document.documentElement.style.overflow = prev);
   }, []);
 
+  // Keyboard controls
   React.useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") onClose?.();
@@ -47,6 +50,7 @@ export default function ProjectLightbox({ project, onClose }) {
     <AnimatePresence>
       {/* Backdrop */}
       <motion.div
+        key="pl-backdrop"
         className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -55,7 +59,10 @@ export default function ProjectLightbox({ project, onClose }) {
           if (e.target === e.currentTarget) onClose?.();
         }}
       />
+
+      {/* Dialog */}
       <motion.div
+        key="pl-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-title"
@@ -173,9 +180,9 @@ export default function ProjectLightbox({ project, onClose }) {
           {/* Dots */}
           {media.length > 1 && (
             <div className="flex items-center justify-center gap-2 p-3">
-              {media.map((_, i) => (
+              {media.map((m, i) => (
                 <button
-                  key={i}
+                  key={`${project.title}-${m.type}-${m.src || m.id || i}`}
                   onClick={() => setIndex(i)}
                   className={`h-2.5 w-2.5 rounded-full border ${i === index ? "bg-foreground" : "bg-transparent"}`}
                   aria-label={`Go to item ${i + 1}`}
