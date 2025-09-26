@@ -5,7 +5,7 @@ import { projects } from "../data/projects";
 
 export default function ProjectsSection({ onSelect }) {
   return (
-    <section id="projects" className="py-20 lg:py-28 border-t">
+    <section id="projects" className="py-20 lg:py-28 border-t scroll-mt-20">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <p className="mb-2 text-xs font-semibold tracking-widest text-primary uppercase">Work</p>
@@ -21,6 +21,11 @@ export default function ProjectsSection({ onSelect }) {
               Array.isArray(p.media) &&
               p.media.some((m) => m.type === "youtube" || m.type === "video");
 
+            const fit =
+              p.thumbFit === "cover"
+                ? "h-full w-full object-cover"
+                : "max-h-full max-w-full object-contain";
+
             return (
               <motion.div
                 key={p.title}
@@ -33,17 +38,20 @@ export default function ProjectsSection({ onSelect }) {
                   className="h-full cursor-pointer group rounded-2xl border shadow-sm bg-card text-card-foreground"
                   role="button"
                   tabIndex={0}
+                  aria-label={`Open project: ${p.title}`}
                   onClick={() => requestAnimationFrame(() => onSelect?.(p))}
-                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect?.(p)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") onSelect?.(p);
+                    if (e.key === " ") { e.preventDefault(); onSelect?.(p); }
+                  }}
                 >
                   <div className="p-5">
-                    {/* Preview: padded, centered, no-crop */}
                     <div className="relative aspect-video rounded-xl bg-muted mb-4 overflow-hidden p-2 sm:p-3 flex items-center justify-center">
                       {p.thumb ? (
                         <img
                           src={p.thumb}
                           alt={`${p.title} preview`}
-                          className="block max-h-full max-w-full object-contain origin-center transition-transform duration-300 group-hover:scale-[1.01]"
+                          className={`block ${fit} origin-center transition-transform duration-300 group-hover:scale-[1.01]`}
                           draggable={false}
                           loading="lazy"
                           decoding="async"

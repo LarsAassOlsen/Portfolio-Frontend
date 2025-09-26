@@ -6,6 +6,46 @@ import { X, ChevronLeft, ChevronRight, Github, ExternalLink } from "lucide-react
 export default function ProjectLightbox({ project, onClose }) {
   if (!project) return null;
 
+  const dialogRef = React.useRef(null);
+  const closeBtnRef = React.useRef(null);
+  const lastFocusedRef = React.useRef(null);
+
+  React.useEffect(() => {
+    lastFocusedRef.current = document.activeElement;
+    // Focus close button when dialog mounts
+    closeBtnRef.current?.focus();
+    return () => {
+      // Restore focus to the last active element
+      lastFocusedRef.current?.focus?.();
+    };
+  }, []);
+
+  // Focus trap
+  React.useEffect(() => {
+    function trap(e) {
+      if (e.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusables = root.querySelectorAll(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      );
+      const list = Array.from(focusables);
+      if (list.length === 0) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", trap);
+    return () => document.removeEventListener("keydown", trap);
+  }, []);
+
   // Media list
   const rawMedia = React.useMemo(() => {
     if (Array.isArray(project.media) && project.media.length) return project.media;
@@ -48,21 +88,18 @@ export default function ProjectLightbox({ project, onClose }) {
 
   return createPortal(
     <AnimatePresence>
-      {/* Backdrop */}
       <motion.div
         key="pl-backdrop"
         className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) onClose?.();
-        }}
+        onMouseDown={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
+        aria-hidden="true"
       />
-
-      {/* Dialog */}
       <motion.div
         key="pl-dialog"
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-title"
@@ -76,13 +113,13 @@ export default function ProjectLightbox({ project, onClose }) {
           className="w-[min(96vw,1100px)] max-h-[90vh] overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-xl"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <div className="min-w-0">
               <h3 id="project-title" className="text-lg font-semibold truncate">{project.title}</h3>
               <p className="text-sm text-muted-foreground line-clamp-2">{project.desc}</p>
             </div>
             <button
+              ref={closeBtnRef}
               onClick={onClose}
               className="inline-flex items-center gap-2 rounded-xl px-3 py-2 border hover:shadow-sm"
               aria-label="Close"
@@ -105,6 +142,7 @@ export default function ProjectLightbox({ project, onClose }) {
 
               {current?.type === "youtube" && current.id && (
                 <iframe
+                  loading="lazy"
                   className="h-full w-full"
                   src={`https://www.youtube-nocookie.com/embed/${current.id}?rel=0&modestbranding=1&autoplay=1`}
                   title={current.title || project.title}
@@ -179,16 +217,29 @@ export default function ProjectLightbox({ project, onClose }) {
 
           {/* Dots */}
           {media.length > 1 && (
-            <div className="flex items-center justify-center gap-2 p-3">
-              {media.map((m, i) => (
-                <button
-                  key={`${project.title}-${m.type}-${m.src || m.id || i}`}
-                  onClick={() => setIndex(i)}
-                  className={`h-2.5 w-2.5 rounded-full border ${i === index ? "bg-foreground" : "bg-transparent"}`}
-                  aria-label={`Go to item ${i + 1}`}
-                />
-              ))}
-            </div>
+            <nav aria-label="Media pagination">
+              <div className="flex items-center justify-center gap-2 p-3">
+                {media.map((m, i) => {
+                  const active = i === index;
+                  return (
+                    <button
+                      key={`${project.title}-${m.type}-${m.src || m.id || i}`}
+                      onClick={() => setIndex(i)}
+                      aria-label={`Go to item ${i + 1}`}
+                      aria-current={active ? "true" : undefined}
+                      className={[
+                        "h-2.5 w-2.5 rounded-full transition-all duration-200",
+                        "border",
+                        "border-foreground/40",
+                        active
+                          ? "bg-primary border-primary ring-2 ring-primary/40 scale-110"
+                          : "bg-transparent hover:bg-foreground/20"
+                      ].join(" ")}
+                    />
+                  );
+                })}
+              </div>
+            </nav>
           )}
         </div>
       </motion.div>

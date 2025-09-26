@@ -3,7 +3,7 @@ import { about } from "../data/about";
 
 export default function AboutSection() {
   return (
-    <section id="about" className="py-20 lg:py-28">
+    <section id="about" className="py-20 lg:py-28 scroll-mt-20">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           {about.eyebrow && (

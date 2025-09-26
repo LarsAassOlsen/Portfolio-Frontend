@@ -50,6 +50,8 @@ export default function Portfolio() {
     const root = document.documentElement;
     root.classList.toggle("dark", dark);
     localStorage.setItem("theme", dark ? "dark" : "light");
+    const meta = document.querySelector('#theme-color');
+    if (meta) meta.setAttribute('content', dark ? '#0a0a0a' : '#ffffff');
   }, [dark]);
 
   // Smooth-scroll for same-page anchors

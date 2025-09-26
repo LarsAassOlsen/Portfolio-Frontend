@@ -1,12 +1,41 @@
-# React + Vite
+# Lars Aass Olsen — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A portfolio built with **React**, **Vite**, and **Tailwind v4**.  
+Features a media lightbox (images/YouTube/self-hosted video), no-flash dark mode, and a Formspree contact form.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech stack
 
-## Expanding the ESLint configuration
+- **React 19** + **Vite 7**
+- **Tailwind CSS v4**
+- **Framer Motion** (animations, lightbox transitions)
+- **Lucide Icons**
+- **Formspree** (contact form handling)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Requirements
+
+- **Node.js**: `>=20.19 <21` or `>=22.12`
+- **npm** 10+ (comes with Node)
+
+> Check: `node -v`  
+> Windows (optional): use [nvm-windows] to install/manage Node versions.
+
+---
+
+## Quick start
+
+```bash
+# install deps
+npm install
+
+# run dev server
+npm run dev
+
+# build for production
+npm run build
+
+# preview built site locally
+npm run preview

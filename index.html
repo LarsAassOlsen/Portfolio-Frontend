@@ -2,13 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <style>
+      html { background:#ffffff; }
+      html.dark { background:#0a0a0a; }
+    </style>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = stored ? stored === 'dark' : prefersDark;
+
+          var root = document.documentElement;
+          if (dark) root.classList.add('dark'); else root.classList.remove('dark');
+
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', dark ? '#0a0a0a' : '#ffffff');
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="theme-color" content="#ffffff" id="theme-color" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lars Aass Olsen — Portfolio</title>
     <meta name="description" content="Backend developer with frontend and game dev experience." />
     <meta property="og:title" content="Lars Aass Olsen — Portfolio" />
     <meta property="og:description" content="Backend developer with frontend and game dev experience." />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="/favicon.ico" />
   </head>
   <body>
     <div id="root"></div>

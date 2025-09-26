@@ -19,7 +19,7 @@ const Button = ({ href, children, className = "", icon: Icon }) => {
 
 export default function HeroSection({ imgSrc }) {
   return (
-    <section id="home" className="relative overflow-hidden">
+    <section id="home" className="relative overflow-hidden scroll-mt-20">
       <div className="w-full px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 py-20 lg:py-28 items-center">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <p className="text-sm font-semibold tracking-widest text-primary uppercase">Hello, I'm</p>
